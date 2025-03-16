@@ -1,0 +1,137 @@
+Nama	: Fauzan Hadi
+NIM	: 24060123140176
+Praktikum GKV B1
+Tugas NO1
+
+Jelaskan Bagaimana cara kerja Kode Lengan di atas!
+Kode di atas digunakan untuk mensimulasikan pergerakan lengan dengan dua bagian utama, yaitu bahu (shoulder) dan siku (elbow). Berikut penjelasan tentang cara kerja kode tersebut:
+1. Inisialisasi dan Variabel Global
+Kode:
+#include <GL/glut.h>
+static int shoulder = 0, elbow = 0;
+Penjelasan:
+- #include <GL/glut.h> = Mengimpor pustaka GLUT yang diperlukan untuk grafika OpenGL.
+- static int shoulder = 0, elbow = 0;
+	- Variabel shoulder menyimpan sudut rotasi bahu.
+	- Variabel elbow menyimpan sudut rotasi siku.
+	- static memastikan nilai tetap ada selama program berjalan.
+
+2. Fungsi init() (Inisialisasi OpenGL)
+Kode:
+void init(void) {
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glShadeModel(GL_FLAT);
+}
+Penjelasan:
+- glClearColor(0.0, 0.0, 0.0, 0.0); = Mengatur warna latar belakang layar menjadi hitam (R=0, G=0, B=0, A=0).
+- glShadeModel(GL_FLAT); = Menggunakan model shading flat (permukaan poligon memiliki warna seragam).
+
+3. Fungsi display() (Menggambar dan Menggerakkan Lengan)
+Kode:
+void display(void) {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glPushMatrix();
+Penjelasan:
+- glClear(GL_COLOR_BUFFER_BIT); = Menghapus layar sebelum menggambar ulang.
+- glPushMatrix(); = Menyimpan kondisi transformasi awal sebelum melakukan transformasi baru.
+
+3a. Transformasi dan Penggambaran Bahu
+kode:
+    glTranslatef(-1.0, 0.0, 0.0);
+    glRotatef((GLfloat) shoulder, 0.0, 0.0, 1.0);
+    glTranslatef(1.0, 0.0, 0.0);
+Penjelasan:
+- glTranslatef(-1.0, 0.0, 0.0); = Menggeser titik awal objek ke kiri untuk menempatkan bahu sebagai pusat rotasi.
+-glRotatef((GLfloat) shoulder, 0.0, 0.0, 1.0); = Memutar bahu terhadap sumbu z sebesar shoulder derajat.
+- glTranslatef(1.0, 0.0, 0.0); = Mengembalikan posisi objek ke tempat semula setelah rotasi.
+
+kode:
+    glPushMatrix();
+    glScalef(2.0, 0.4, 1.0);
+    glutWireCube(1.0);
+    glPopMatrix();
+Penjelasan:
+- glPushMatrix(); = Menyimpan transformasi sebelum menggambar bahu.
+- glScalef(2.0, 0.4, 1.0); = Mengubah ukuran kubus menjadi memanjang horizontal.
+- glutWireCube(1.0); = Menggambar kerangka kubus untuk lengan atas.
+- glPopMatrix(); = Mengembalikan transformasi ke kondisi sebelum PushMatrix().
+
+3b. Transformasi dan Penggambaran Siku
+kode:
+    glTranslatef(1.0, 0.0, 0.0);
+    glRotatef((GLfloat) elbow, 0.0, 0.0, 1.0);
+    glTranslatef(1.0, 0.0, 0.0);
+Penjelasan:
+- glTranslatef(1.0, 0.0, 0.0); = Menggeser posisi ke titik siku.
+- glRotatef((GLfloat) elbow, 0.0, 0.0, 1.0); = Memutar siku terhadap sumbu z.
+- glTranslatef(1.0, 0.0, 0.0); = Mengembalikan posisi setelah rotasi siku.
+
+kode:
+    glPushMatrix();
+    glScalef(2.0, 0.4, 1.0);
+    glutWireCube(1.0);
+    glPopMatrix();
+Penjelasan:
+Menggambar bagian bawah lengan, menggunakan langkah yang sama seperti bagian bahu.
+
+kode:
+    glPopMatrix();
+    glutSwapBuffers();
+}
+Penjelasan:
+- glPopMatrix(); = Mengembalikan transformasi ke kondisi sebelum PushMatrix().
+- glutSwapBuffers(); = Menggunakan double buffering untuk menghindari flickering.
+
+4. Fungsi reshape() (Menyesuaikan Ukuran Jendela)
+kode:
+void reshape(int w, int h) {
+    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(65.0, (GLfloat) w/(GLfloat) h, 1.0, 20.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glTranslatef(0.0, 0.0, -5.0);
+}
+penjelasan:
+- Menyesuaikan ukuran viewport agar tampilan tetap proporsional.
+- Mengatur proyeksi perspektif dengan gluPerspective(), dengan sudut pandang 65 derajat.
+- Memposisikan kamera lebih jauh (glTranslatef(0.0, 0.0, -5.0);).
+
+5. Fungsi keyboard() (Interaksi Pengguna)
+kode:
+void keyboard(unsigned char key, int x, int y) {
+    switch (key) {
+        case 's': shoulder = (shoulder + 5) % 360; break;
+        case 'S': shoulder = (shoulder - 5) % 360; break;
+        case 'e': elbow = (elbow + 5) % 360; break;
+        case 'E': elbow = (elbow - 5) % 360; break;
+        case 27: exit(0); break;
+    }
+    glutPostRedisplay();
+}
+penjelasan:
+- Tombol 's' / 'S' = Memutar bahu maju/mundur.
+- Tombol 'e' / 'E' = Memutar siku maju/mundur.
+- Tombol ESC (27) = Keluar dari program.
+ glutPostRedisplay(); = Memanggil ulang display() agar perubahan segera terlihat.
+
+6. Fungsi main() (Menjalankan Program)
+kode:
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(700, 600);
+    glutInitWindowPosition(100, 100);
+    glutCreateWindow(argv[0]);
+    init();
+    glutDisplayFunc(display);
+    glutReshapeFunc(reshape);
+    glutKeyboardFunc(keyboard);
+    glutMainLoop();
+    return 0;
+}
+penjelasan:
+- Menginisialisasi GLUT dan membuat jendela tampilan.
+- Mendaftarkan fungsi utama (display, reshape, keyboard).
+- Menjalankan loop utama dengan glutMainLoop();.
